@@ -1,22 +1,30 @@
+# Lab 3 - stap 2: dependencies.yml
+# checkout + Node installeren + dependencies + verificatie
 name: Dependencies Example
+
 on:
-  workflow_dispatch:
+  workflow_dispatch:                # handmatige start (lab zegt geen trigger)
 
 jobs:
-  dependencies:                            
-    runs-on: ubuntu-latest          
+  dependencies:                     # jobnaam zelf gekozen
+    runs-on: ubuntu-latest          # "Runs on Ubuntu-latest"
     steps:
-
+      # FETCH CODE - "a step that uses Checkout"
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # REQUIREMENTS - "a step that sets up the NPM framework"
+      #   = Node.js installeren (npm zit erbij) -> uses + with
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      # DEPENDENCIES - leest package.json en maakt de map node_modules
+      #   calculator-app: npm install (npm ci faalt hier)
       - name: Install dependencies
         run: npm install
 
-      - name: listing
+      # VERIFICATIE - "shows the listing" -> in de log zoeken op node_modules
+      - name: Listing
         run: ls -alhR

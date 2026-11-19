@@ -1,14 +1,18 @@
+# Lab 3 - stap 1: checkout.yml
+# "Name is Checkout Example" + checkout + verificatie ls -alhR
 name: Checkout Example
+
 on:
-  workflow_dispatch:
+  workflow_dispatch:                # handmatige start (lab zegt geen trigger)
 
 jobs:
-  checkout:                            
-    runs-on: ubuntu-latest          
+  checkout:                         # jobnaam zelf gekozen
+    runs-on: ubuntu-latest          # "Runs on Ubuntu-latest"
     steps:
-
+      # FETCH CODE - "a step that uses Checkout to check the code out to the runner"
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: listing
+      # VERIFICATIE - "shows the listing and contents of the directories"
+      - name: Listing
         run: ls -alhR

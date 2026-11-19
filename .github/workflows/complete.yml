@@ -1,0 +1,54 @@
+# Lab 3 - CI in GitHub Actions: complete.yml
+# fetch code -> Node -> dependencies -> unit tests + rapport -> zip -> artifacts
+name: Build Example                 # "Name is Build Example"
+
+on:
+  workflow_dispatch:                # handmatige start (lab zegt geen trigger)
+
+jobs:
+  build:                            # jobnaam zelf gekozen
+    runs-on: ubuntu-latest          # "Runs on Ubuntu-latest"
+    steps:
+      # 1. FETCH CODE - "a step that uses Checkout"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. REQUIREMENTS - "sets up the NPM framework" = Node.js installeren (npm zit erbij)
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 3. DEPENDENCIES - leest package.json, maakt de map node_modules
+      #    calculator-app: npm install (npm ci faalt hier)
+      - name: Install dependencies
+        run: npm install
+
+      # 4. TEST + RAPPORT - "checks the unit tests and creates a report"
+      #    npm test = jest ; -- --coverage = rapport in map coverage/
+      #    jest-junit (staat in package.json) maakt ook junit.xml
+      - name: Unit tests met coverage
+        run: npm test -- --coverage
+
+      # 5. BUILD - "bundles the code into a zip (all app files + node_modules)"
+      #    . = alles in de map ; -x = niet meenemen (git en het testrapport)
+      - name: Bundle zip
+        run: zip -r app.zip . -x ".git/*" "coverage/*"
+
+      # 6. ARTIFACT - de zip bewaren (runner wordt na de run gewist)
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: app
+          path: app.zip
+
+      # 7. ARTIFACT - testrapporten bewaren, ook als de testen falen
+      #    path: | = meerdere bestanden/mappen in een artifact
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            junit.xml
+            coverage/
